@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  4k_desktop:
+    build: 4k_build
+    container_name: 4k_desktop
+    environment:
+      - RESOLUTION=1024x768
+      - USER=desktopuser
+      - PASSWORD=desktopuser
+      - OPENBOX_ARGS=--startup "su desktopuser -c 'actiona /actiona_script/4k.ascr -e -x -E'"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./4k_data/config:/home/desktopuser/.config/4kdownload.com/
+      - ./4k_data/database:/home/desktopuser/.local/share/4kdownload.com/4K Video Downloader/4K Video Downloader/
+      - ./4k_data/downloads:/home/desktopuser/Videos/4K Video Downloader
+      - ./4k_data/logs:/4k_logs
+      - ./actiona_script:/actiona_script
+    ports:
+      - 127.0.0.1:8887:80

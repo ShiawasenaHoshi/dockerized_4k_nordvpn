@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  nordvpn-client:
+    build: https://github.com/Joentje/nordvpn-proxy.git
+    container_name: nordvpn-client
+    env_file: .env
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    dns:
+      - 103.86.96.100
+      - 103.86.99.100
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./ovpn-data:/app/ovpn/config
+    networks:
+      - default
+    ports:
+#      - 127.0.0.1:8118:8118
+      - 127.0.0.1:8887:80
+    restart: always
+
+  4k_desktop:
+    build: 4k_build
+    container_name: 4k_desktop
+    environment:
+      - RESOLUTION=1024x768
+      - USER=desktopuser
+      - PASSWORD=desktopuser
+      - OPENBOX_ARGS=--startup "su desktopuser -c 'actiona /actiona_script/4k.ascr -e -x -E'"
+    depends_on:
+      - "nordvpn-client"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./4k_data/config:/home/desktopuser/.config/4kdownload.com/
+      - ./4k_data/database:/home/desktopuser/.local/share/4kdownload.com/4K Video Downloader/4K Video Downloader/
+      - ./4k_data/downloads:/home/desktopuser/Videos/4K Video Downloader
+      - ./4k_data/logs:/4k_logs
+      - ./actiona_script:/actiona_script
+    restart: always
+    network_mode: "service:nordvpn-client"
